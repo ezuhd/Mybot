@@ -95,3 +95,5 @@ def handle_msg(message):
 
 print("--- 🔄 ቦቱ በ MongoDB እየተነሳ ነው... ---")
 bot.polling(none_stop=True)
+bot.remove_webhook()
+bot.infinity_polling()
