@@ -2,16 +2,33 @@ import telebot
 from telebot import types
 import os, time
 from pymongo import MongoClient
+from flask import Flask
+from threading import Thread
 
-# --- ማዋቀሪያ (ሚስጥራዊ መረጃዎች እዚህ ኮድ ውስጥ የሉም!) ---
+# --- Render እንዳያጠፋው የውሸት ሰርቨር (Flask) ማዘጋጃ ---
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is alive!"
+
+def run():
+    # Render የሚሰጠንን ፖርት መጠቀም፣ ከሌለ 8080
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# --- ማዋቀሪያ (ሚስጥራዊ መረጃዎች) ---
 TOKEN = os.getenv('BOT_TOKEN')
 ADMIN_ID_STR = os.getenv('ADMIN_ID')
 MONGO_URI = os.getenv('MONGO_URI')
 MY_GROUP_LINK = "https://t.me/ezuhd"
 
-# መረጃዎቹ መኖራቸውን ማረጋገጫ
 if not TOKEN or not ADMIN_ID_STR or not MONGO_URI:
-    print("❌ ስህተት: BOT_TOKEN, ADMIN_ID ወይም MONGO_URI በ Koyeb ላይ አልተሞሉም!")
+    print("❌ ስህተት: BOT_TOKEN, ADMIN_ID ወይም MONGO_URI አልተሞሉም!")
     exit(1)
 
 ADMIN_ID = int(ADMIN_ID_STR)
@@ -47,7 +64,6 @@ def main_menu():
     return m
 
 # --- የቦቱ ስራዎች ---
-
 @bot.message_handler(commands=['start'])
 def welcome(message):
     u = message.from_user
@@ -93,7 +109,8 @@ def handle_msg(message):
     except Exception as e:
         print(f"Forward ስህተት: {e}")
 
-print("--- 🔄 ቦቱ በ MongoDB እየተነሳ ነው... ---")
-bot.polling(none_stop=True)
-bot.remove_webhook()
-bot.infinity_polling()
+# --- ማስጀመሪያ ---
+if __name__ == "__main__":
+    print("--- 🔄 ሰርቨሩ እና ቦቱ እየተነሱ ነው... ---")
+    keep_alive() # Flask ሰርቨሩን ያስነሳል
+    bot.infinity_polling(none_stop=True) # ቦቱን ያስነሳል
