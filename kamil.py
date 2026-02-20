@@ -1,4 +1,3 @@
-cat <<EOF > kamil.py
 import telebot
 from telebot import types
 import os
@@ -139,4 +138,3 @@ if __name__ == "__main__":
     Thread(target=run_server).start()
     print("🚀 ቦቱ በ Gemini እና Flask እየተነሳ ነው...")
     bot.infinity_polling(skip_pending=True)
-EOF
